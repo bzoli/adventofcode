@@ -6,22 +6,31 @@ fun main(args: Array<String>) {
 //    println("Program arguments: ${args.joinToString()}")
 
     val lineList = lines.lines()
+    val strDigits = listOf("one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
     var sum = 0
     for (line in lineList) {
-        val firstDigit = line.first { it.isDigit() }
-        val lastDigit = line.last { it.isDigit() }
-        val total = (firstDigit.toString()+lastDigit.toString()).toInt()
+        var replacedLine = line
+        for ((index, strDigit) in strDigits.withIndex()) {
+            replacedLine = replacedLine.replace(strDigit, (index + 1).toString())
+        }
+
+        val firstDigit = replacedLine.first { it.isDigit() }
+        val lastDigit = replacedLine.last { it.isDigit() }
+        val total = (firstDigit.toString() + lastDigit.toString()).toInt()
+        println(total)
         sum += total
     }
     println(sum)
-
 }
-val liness = """1abc2
-    pqr3stu8vwx
-    a1b2c3d4e5f
-    treb7uchet"""
+val lines = """two1nine
+eightwothree
+abcone2threexyz
+xtwone3four
+4nineeightseven2
+zoneight234
+7pqrstsixteen"""
 
-val lines = """nine92jnhgqzctpgbcbpz
+val liness = """nine92jnhgqzctpgbcbpz
 sevensddvc73three
 9986fmfqhdmq8
 7onexmxbzllfqb
