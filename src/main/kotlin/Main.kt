@@ -1,17 +1,23 @@
 fun main(args: Array<String>) {
-//    println("Hello World!")
-//
-//    // Try adding program arguments via Run/Debug configuration.
-//    // Learn more about running applications: https://www.jetbrains.com/help/idea/running-applications.html.
-//    println("Program arguments: ${args.joinToString()}")
 
     val lineList = lines.lines()
-    val strDigits = listOf("one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
+    val replacements = mapOf(
+        "one" to "1",
+        "two" to "2",
+        "three" to "3",
+        "four" to "4",
+        "five" to "5",
+        "six" to "6",
+        "seven" to "7",
+        "eight" to "8",
+        "nine" to "9"
+    )
+    val pattern = replacements.keys.joinToString(separator = "|").toRegex()
+
     var sum = 0
     for (line in lineList) {
-        var replacedLine = line
-        for ((index, strDigit) in strDigits.withIndex()) {
-            replacedLine = replacedLine.replace(strDigit, (index + 1).toString())
+        val replacedLine = line.replace(pattern) { match ->
+            replacements[match.value] ?: match.value
         }
 
         val firstDigit = replacedLine.first { it.isDigit() }
@@ -22,7 +28,9 @@ fun main(args: Array<String>) {
     }
     println(sum)
 }
-val lines = """two1nine
+
+
+val liness = """two1nine
 eightwothree
 abcone2threexyz
 xtwone3four
@@ -30,7 +38,7 @@ xtwone3four
 zoneight234
 7pqrstsixteen"""
 
-val liness = """nine92jnhgqzctpgbcbpz
+val lines = """nine92jnhgqzctpgbcbpz
 sevensddvc73three
 9986fmfqhdmq8
 7onexmxbzllfqb
