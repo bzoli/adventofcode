@@ -1,3 +1,4 @@
+
 fun main(args: Array<String>) {
 
     val lineList = lines.lines()
@@ -12,25 +13,42 @@ fun main(args: Array<String>) {
         "eight" to "8",
         "nine" to "9"
     )
-    val pattern = replacements.keys.joinToString(separator = "|").toRegex()
+    val pattern = replacements.keys.joinToString(separator = "|")
 
     var sum = 0
     for (line in lineList) {
-        val replacedLine = line.replace(pattern) { match ->
-            replacements[match.value] ?: match.value
+        val firtsAlphabetical = line.replaceFirst(pattern.toRegex()) { matchResult ->
+            replacements[matchResult.value] ?: matchResult.value
+        }
+        val lastAlphabetical = firtsAlphabetical.reversed().replaceFirst(pattern.reversed().toRegex()) { matchResult ->
+            replacements[matchResult.value.reversed()] ?: matchResult.value.reversed()
         }
 
-        val firstDigit = replacedLine.first { it.isDigit() }
-        val lastDigit = replacedLine.last { it.isDigit() }
+        val resultAlphabetical = lastAlphabetical.reversed()
+        val firstDigit = resultAlphabetical.first { it.isDigit() }
+        val lastDigit = resultAlphabetical.last { it.isDigit() }
         val total = (firstDigit.toString() + lastDigit.toString()).toInt()
-        println(total)
+        println("${line}: total: ${total}")
         sum += total
     }
     println(sum)
 }
+fun CharSequence.replaceFirst(regex: Regex, transform: (MatchResult) -> CharSequence): String {
+    var found = false
+    return regex.replace(this) { matchResult ->
+        if (!found) {
+            found = true
+            transform(matchResult)
+        } else {
+            matchResult.value
+        }
+    }
+}
 
 
-val liness = """two1nine
+val boti = """eighteightsrfcxtvg7three1two9nineeightwolqn"""
+val test1 = """zoneight234"""
+val test2 = """two1nine
 eightwothree
 abcone2threexyz
 xtwone3four
