@@ -1,4 +1,3 @@
-
 fun main(args: Array<String>) {
 
     val lineList = lines.lines()
@@ -13,26 +12,30 @@ fun main(args: Array<String>) {
         "eight" to "8",
         "nine" to "9"
     )
-    val pattern = replacements.keys.joinToString(separator = "|")
+    val patternStr = replacements.keys.joinToString(separator = "|")
 
     var sum = 0
     for (line in lineList) {
-        val firtsAlphabetical = line.replaceFirst(pattern.toRegex()) { matchResult ->
+        val firtsAlphabetical = line.replaceFirst(patternStr.toRegex()) { matchResult ->
             replacements[matchResult.value] ?: matchResult.value
         }
-        val lastAlphabetical = firtsAlphabetical.reversed().replaceFirst(pattern.reversed().toRegex()) { matchResult ->
+//        println(firtsAlphabetical)
+        val firstDigit = firtsAlphabetical.first { it.isDigit() }
+//        println(firstDigit)
+
+        val lastAlphabetical = line.replaceLast(patternStr) { matchResult ->
             replacements[matchResult.value.reversed()] ?: matchResult.value.reversed()
         }
-
-        val resultAlphabetical = lastAlphabetical.reversed()
-        val firstDigit = resultAlphabetical.first { it.isDigit() }
-        val lastDigit = resultAlphabetical.last { it.isDigit() }
+//        println(lastAlphabetical)
+        val lastDigit = lastAlphabetical.last { it.isDigit() }
+//        println(lastDigit)
         val total = (firstDigit.toString() + lastDigit.toString()).toInt()
         println("${line}: total: ${total}")
         sum += total
     }
     println(sum)
 }
+
 fun CharSequence.replaceFirst(regex: Regex, transform: (MatchResult) -> CharSequence): String {
     var found = false
     return regex.replace(this) { matchResult ->
@@ -45,7 +48,38 @@ fun CharSequence.replaceFirst(regex: Regex, transform: (MatchResult) -> CharSequ
     }
 }
 
+fun CharSequence.replaceLast(regexStr: String, transform: (MatchResult) -> CharSequence): String {
+    return this.reversed().replaceFirst(regexStr.reversed().toRegex(), transform).reversed()
+}
 
+
+val test4 = """37dqpbmqxssvznrzp2nvzcvlnsdoneightq"""
+val test3 = """4onethreekzpkpkpmxlpnsvqtlmtrsgznxkckrpsqskbz6
+9vvcsgxq
+nlvfrjghsnbnine19
+pdxlsxthvmone25eight
+613twoseven9
+123fdx
+dnqgrzzmxxdjzknc3
+twodm2
+thprcxhggclfnlsixzhl863ninevzzvfvhz
+1fourkbfhhzclz1
+5qvtpll6eight1
+sevenfourninedmrccgnbd8ncbjjm
+3threezv6nine
+kq279fiveoneone8four
+nlqlzbbnrn2
+8jqhncbfsxvrrqxfkv
+r5onefive
+znlzncgngjlpxhmmmxprseventhree7
+jkpbfpvssixxpfjcs528
+four4fsts53fdgckkz
+kjrkflhmlk11psixdhpxbstklx
+4788vhrlqltv
+1zntp2
+9htgdlbktwo7pthree
+37dqpbmqxssvznrzp2nvzcvlnsdoneightq
+zkcjnc6zgsrcmvthcjsfgvbtxh"""
 val boti = """eighteightsrfcxtvg7three1two9nineeightwolqn"""
 val test1 = """zoneight234"""
 val test2 = """two1nine
