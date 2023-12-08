@@ -1,5 +1,10 @@
 package day_5_2
+
 import common.timing
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.runBlocking
 
 fun main(args: Array<String>) {
     val bridges = readBridges(
@@ -11,33 +16,40 @@ fun main(args: Array<String>) {
         temperatureToHumidity,
         humidityToLocation
     )
-    var smallestLocation: Long? = Long.MAX_VALUE;
-    var seedGotcha: Long? = 0L;
+
     val seeds = seeds.split(" ").map { it.toLong() }
+    // Ha visszafele mappelnenek, azaz a location-ok felol mennenk a seed fele, es 0L lenne az elso loc, amit vizsgalnank
+    // majd novelnenk loc 1L jonne, ... akkor az elso olyan loc erteknel megallhatnank, amihez van seed, hiszen az
+    // a legkisebb loc ertek lenne.
+    // Ha viszont a
+    // seeds: <a: olyan ertek, ami x-re mappelodik> <b: nagyon kicsi ertek>
+    // humidity-to-location map: <x: nagyon nagy ertek> <y> <z>
+    // lenne a az input, akkor <x: nagyon nagy ertek> szamu iterciora lenne szukseg
+    // Ha viszont nem visszafele mappelnenk, akkor <b: nagyon kicsi ertek> szamu iteraciora lenne szukseg
+    // Elvi hibasnak tunik tehat a reverse mapping.
 
     timing {
-        for (i in seeds.indices step 2) {
-            val seedRange = seeds[i]..<seeds[i] + seeds[i + 1]
-            println(seedRange)
-            for (seed in seedRange) {
-
-                // print("s:${seed} ")
-                var nextBridgeSource: Long? = null;
-                bridges.forEach { bridge ->
-                    // println(nextBridgeSource ?: seed)
-                    nextBridgeSource = bridge.getDestination(nextBridgeSource ?: seed)
+        var result = runBlocking {
+            (0..seeds.size - 2 step 2).map {
+                val seedRange = seeds[it]..<seeds[it] + seeds[it + 1]
+                async(Dispatchers.Default) {
+                    // println("THREAD : ${Thread.currentThread().name}")
+                    var smallestLocation = Long.MAX_VALUE
+                    for (seed in seedRange) {
+                        var nextBridgeSource: Long? = null
+                        bridges.forEach { bridge ->
+                            nextBridgeSource = bridge.getDestination(nextBridgeSource ?: seed)
+                        }
+                        if (nextBridgeSource!! < smallestLocation) {
+                            smallestLocation = nextBridgeSource!!
+                        }
+                    }
+                    smallestLocation
                 }
-                // println(nextBridgeSource)
-                if (nextBridgeSource!! < smallestLocation!!) {
-                    smallestLocation = nextBridgeSource
-                    seedGotcha = seed
-                }
-            }
-            println()
+            }.awaitAll().min()
         }
+        println("smallest location: $result")
     }
-    println("smallestLocation: $smallestLocation")
-    println("seedGotcha: $seedGotcha")
 }
 
 fun readBridges(vararg lines: String): List<Bridge> {
@@ -69,10 +81,6 @@ class Bridge(val sourceRangeStarts: List<Long>, val destinationRangeStarts: List
     }
 }
 
-
-
-
-
 /*
 val seeds = "79 14 55 13"
 
@@ -100,9 +108,10 @@ val temperatureToHumidity = """0 69 1
 
 val humidityToLocation = """60 56 37
 56 93 4"""
-*/
 
-val seeds = "1263068588 44436703 1116624626 2393304 2098781025 128251971 2946842531 102775703 2361566863 262106125 221434439 24088025 1368516778 69719147 3326254382 101094138 1576631370 357411492 3713929839 154258863"
+*/
+val seeds =
+    "1263068588 44436703 1116624626 2393304 2098781025 128251971 2946842531 102775703 2361566863 262106125 221434439 24088025 1368516778 69719147 3326254382 101094138 1576631370 357411492 3713929839 154258863"
 
 val seedToSoil = """2056129205 3495540274 7275274
 2093671499 2217398614 16037515
