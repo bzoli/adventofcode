@@ -6,7 +6,7 @@ fun main() {
         counter++
         //println(Pipes.getPipe())
     } while (Pipes.step() != 'S')
-    println(counter)
+    println(counter/2)
 }
 
 data class Point(val x: Int, val y: Int) {
